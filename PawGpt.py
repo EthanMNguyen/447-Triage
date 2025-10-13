@@ -15,7 +15,7 @@ from PIL import Image
 def app():
     st.set_page_config(layout="wide")
     st.markdown(
-    """
+    """# backgroud gradient
     <style>
     .stApp {
     background: linear-gradient(to top, #FFBF00, #FFFFFF);
