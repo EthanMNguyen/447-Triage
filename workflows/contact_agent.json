@@ -1,0 +1,177 @@
+{
+  "name": "Contact Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "1c03385b-ef37-425a-be27-e6d86e4060a1",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.query }}",
+        "options": {
+          "systemMessage": "=## ROLE \nYOU ARE AN AI CONTACT OPERATIONS AGENT DESIGNED TO ACCESS, UTILIZE, AND ACT ON CONTACT INFORMATION — INCLUDING EMAIL ADDRESSES — TO SUPPORT TASKS THAT REQUIRE REACHING OUT TO INDIVIDUALS, IDENTIFYING THEIR CONTACT METHODS, OR EXECUTING COMMUNICATION-RELATED WORKFLOWS. YOU ARE ALLOWED TO ACCESS A PERSON'S EMAIL ADDRESS IF IT IS RELEVANT TO THE CURRENT TASK.\n\n###OBJECTIVE###\n\n- ACCESS and UTILIZE a person’s email address IF it is relevant or helpful for fulfilling a clearly defined task  \n- CONFIRM that the contact data is available and formatted correctly  \n- LOGICALLY DETERMINE whether access is needed — without requiring ultra-strict permissions  \n- HANDLE edge cases where no email is found with a fallback response  \n- ALWAYS ACT WITH PURPOSE: No speculative lookups or unauthorized data retrieval\n\n###CHAIN OF THOUGHTS###\n\n1. **UNDERSTAND** the user’s intent and determine if the task involves reaching out to a person  \n2. **IDENTIFY** whether accessing the person's email is needed to perform the task  \n3. **ACCESS** the email address from available records or data structures  \n4. **VERIFY** that the retrieved email is correctly formatted and usable  \n5. **CONFIRM ACCESS**: Provide feedback that the contact data is accessible and can be used  \n6. **OPTIONAL ACTIONS**: If requested, use the email to initiate an action (e.g., send email, tag contact, log task)  \n7. **HANDLE MISSING DATA**: If no email is found, return a clear message with optional suggestions\n\n###WHAT NOT TO DO###\n\n- DO NOT ATTEMPT TO ACCESS CONTACT INFORMATION WITHOUT A REASONABLE TASK-BASED JUSTIFICATION  \n- DO NOT HIDE OR WITHHOLD EMAIL INFORMATION WHEN IT IS NEEDED FOR AN ACTION  \n- NEVER FABRICATE CONTACT DATA — ONLY RETURN WHAT EXISTS IN RECORDS  \n- AVOID SENDING OR INITIATING MESSAGES UNLESS TRIGGERED BY A SPECIFIC TASK\n\n###EXAMPLES###\n\n**EXAMPLE 1 – VALID EMAIL ACCESS REQUEST**  \nUser: “Can you email Sarah Zhang the meeting notes?”  \n→ Action:  \n- Task involves sending email  \n- Email required → ✅  \n- Email found: sarah.zhang@company.com  \n- Reply: “Email address found and ready for use: sarah.zhang@company.com. Proceeding to send.”\n\n**EXAMPLE 2 – CONFIRM ACCESS ONLY**  \nUser: “Do you have an email for Michael Brown?”  \n→ Action:  \n- Request is for confirmation, not sending  \n- Email lookup: ✅  \n- Email found: michael.brown@domain.com  \n- Reply: “Yes, email address is available: michael.brown@domain.com.”\n\n**EXAMPLE 3 – MISSING EMAIL**  \nUser: “Contact Lisa Monroe with the update.”  \n→ Action:  \n- Task requires contact  \n- Email lookup: ❌ Not found  \n- Reply: “No email address available for Lisa Monroe. Please provide alternative contact method.”\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        220,
+        0
+      ],
+      "id": "1b2f598b-6d1d-4289-a32e-983d4256fc19",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        140,
+        220
+      ],
+      "id": "28caea60-8b2b-4b81-89c7-d419f2212c3b",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "F3oSoJLvS41oIIWu",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "limit": 5,
+        "fields": [
+          "emailAddresses",
+          "names"
+        ],
+        "useQuery": true,
+        "query": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Query', ``, 'string') }}"
+      },
+      "type": "n8n-nodes-base.googleContactsTool",
+      "typeVersion": 1,
+      "position": [
+        520,
+        220
+      ],
+      "id": "b4d9acc1-b473-4389-bad7-9e8afa47bab4",
+      "name": "Search contact",
+      "credentials": {
+        "googleContactsOAuth2Api": {
+          "id": "3Ci3WntIKGQSq3kf",
+          "name": "Google Contacts account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "familyName": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Family_Name', ``, 'string') }}",
+        "givenName": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Given_Name', ``, 'string') }}",
+        "additionalFields": {
+          "emailsUi": {
+            "emailsValues": [
+              {
+                "type": "home",
+                "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('emailsValues0_Value', ``, 'string') }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleContactsTool",
+      "typeVersion": 1,
+      "position": [
+        380,
+        220
+      ],
+      "id": "f5f81142-8fab-40c7-9227-244254835cd5",
+      "name": "Create",
+      "credentials": {
+        "googleContactsOAuth2Api": {
+          "id": "3Ci3WntIKGQSq3kf",
+          "name": "Google Contacts account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "query": "Add a new contact for John Doe with the email address john@test.com"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search contact": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "4f4a1e5d-c6f1-4556-8827-40c8862e0351",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b4ed66d73b3908b3d2a2a6aedad1a6a04f56474367e7652ca28ada9f61172442"
+  },
+  "id": "RspmEtqWFEhNfXps",
+  "tags": []
+}

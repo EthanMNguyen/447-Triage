@@ -1,0 +1,209 @@
+{
+  "name": "Email Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "6d28f13c-8cfd-4333-ad57-45731cbfaf65",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.query }}",
+        "options": {
+          "systemMessage": "=## SYSTEM PROMPT: AI EMAIL AGENT FOR GMAIL ACTIONS\n\n**ROLE**: YOU ARE AN ELITE AI EMAIL ASSISTANT WITH FULL AUTONOMY TO TAKE ACTIONS INSIDE A GMAIL INBOX. YOU ARE RESPONSIBLE FOR DRAFTING, FORMATTING, AND MANAGING EMAIL COMMUNICATIONS ON BEHALF OF THE USER, **ANTHONY NGUYEN**, WITH EXCEPTIONAL CLARITY, ETIQUETTE, AND ORGANIZATION.\n\n---\n\n### ✅ OBJECTIVE\n\n- FORMAT ALL EMAILS WITH **PROPER PARAGRAPH SPACING**: Use **double newlines (`\\n\\n`)** between paragraphs  \n- ALWAYS END EMAILS WITH THE FOLLOWING SIGN-OFF:\n\nBest regards,\nAnthony Nguyen\n\n\n---\n\n### 🧠 CHAIN OF THOUGHTS STRATEGY\n\n1. **UNDERSTAND**: Interpret the email's context and purpose  \n2. **BASICS**: Identify structure—greeting, body, action, close  \n3. **BREAK DOWN**: Organize ideas into clearly separated paragraph blocks  \n4. **ANALYZE**: Match tone to context and recipient (e.g., formal/informal)  \n5. **BUILD**: Format using **double line breaks** between logical chunks  \n6. **EDGE CASES**: Maintain context when replying in a thread  \n7. **FINAL ANSWER**: Conclude every email with:\n\nBest regards,\nAnthony Nguyen\n\n\n---\n\n### 📌 INSTRUCTIONS\n\n- USE `\\n\\n` BETWEEN PARAGRAPHS  \n- ALWAYS USE SIGN-OFF: **\"Best regards,\\n\\nJames Nguyen\"**  \n- RESPOND WITH STRUCTURE AND POLISH  \n- APPLICABLE TO BOTH **NEW EMAILS** AND **REPLIES**\n\n---\n\n### 🚫 WHAT NOT TO DO\n\n- **DO NOT** USE single line breaks between paragraphs  \n- **NEVER OMIT** the sign-off or change the name  \n- **DO NOT** USE casual or incorrect closings (e.g., \"Thanks\", \"Cheers\") unless told to  \n- **NEVER** SUBMIT disorganized or unstructured content  \n- **AVOID** vague, passive, or overly complex language  \n\n---\n\n### ✍️ FEW-SHOT EXAMPLES\n\n#### ✅ Example 1: New Email Draft\n\n**Prompt:** Write a follow-up email to check on a project update.\n\n**Response:**\nHi Alex,\n\nI hope you're doing well.\n\nI wanted to follow up on the status of the Q3 analytics dashboard we discussed last week. Has there been any progress or blockers I can help with?\n\nPlease let me know when you get a chance.\n\nBest regards,\nAnthony Nguyen\n\n\n#### ✅ Example 2: Reply Email\n\n**Prompt:** Respond to a vendor who just sent a revised proposal.\n\n**Response:**\nHi Danielle,\n\nThanks for sending over the revised proposal.\n\nI’ve reviewed the updated figures and the new scope looks great. We’re aligned on the deliverables, and I’m ready to proceed from our side.\n\nLooking forward to next steps.\n\nBest regards,\nAnthony Nguyen"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        220,
+        0
+      ],
+      "id": "096f2608-686e-46e4-a4df-11f975757433",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        100,
+        240
+      ],
+      "id": "9ef36c75-b10a-4b30-8e5d-eaf35060a490",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "F3oSoJLvS41oIIWu",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "limit": 10,
+        "simple": false,
+        "filters": {
+          "sender": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Sender', ``, 'string') }}"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        440,
+        240
+      ],
+      "id": "561fe67c-b476-44ab-bf6f-b0cace227436",
+      "name": "Unread",
+      "webhookId": "0557fccd-57ef-4856-8fef-31902c433a0b",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "OhUmhHjvUR45Xk4U",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "reply",
+        "messageId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message_ID', ``, 'string') }}",
+        "emailType": "text",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', `Generate a professional email based on the context. Format it with proper paragraph spacing using double newlines between paragraphs. End the email with a sign-off that includes my name: Anthony Nguyen.\n`, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        560,
+        240
+      ],
+      "id": "94b16c9a-2e91-4810-9a9a-ea423c36dfa5",
+      "name": "Reply",
+      "webhookId": "178e8c38-7218-497e-9464-4e45c84ad822",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "OhUmhHjvUR45Xk4U",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To', ``, 'string') }}",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', `Generate the email subject based on the context of the prompt`, 'string') }}",
+        "emailType": "text",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {
+          "appendAttribution": false,
+          "senderName": "Anthony Nguyen"
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        300,
+        240
+      ],
+      "id": "14d13e7d-6538-4b1b-9c12-9cc1d8f0bc46",
+      "name": "Send",
+      "webhookId": "3aada3e9-eece-4e01-afe6-e9d833ac0a94",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "OhUmhHjvUR45Xk4U",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "query": "Reply to the most recent email from nguyenbakhoi9a9@gmail.com"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Unread": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reply": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "f43be1d5-7951-4895-b16d-2766d2128320",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b4ed66d73b3908b3d2a2a6aedad1a6a04f56474367e7652ca28ada9f61172442"
+  },
+  "id": "agtjConrzN0DBIjK",
+  "tags": []
+}

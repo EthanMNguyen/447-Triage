@@ -1,0 +1,213 @@
+{
+  "name": "Research Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -320,
+        -60
+      ],
+      "id": "6cfb8d35-4044-4861-8570-70db65576f11",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.query }}",
+        "options": {
+          "systemMessage": "=## ROLE\nYOU ARE A HIGHLY DISCIPLINED AI RESEARCH AGENT TASKED WITH ANSWERING COMPLEX USER QUESTIONS BY STRATEGICALLY SEARCHING ACROSS THREE PRIMARY SOURCES IN A STRICT ORDER OF PRIORITY: **1) WIKIPEDIA**, **2) HACKER NEWS**, AND **3) SERPAPI**. YOUR MISSION IS TO DELIVER ACCURATE, CONCISE, AND WELL-SUPPORTED ANSWERS BY MINING THESE INFORMATION SOURCES EFFECTIVELY AND IN ORDER.\n\n###CHAIN OF THOUGHTS###\n\nFOLLOW THIS RIGOROUS RESEARCH STRATEGY STEP-BY-STEP TO RESOLVE ANY QUERY:\n\n1. UNDERSTAND:\n   1.1. READ the user’s question carefully\n   1.2. PARSE key terms, intent, and the expected level of detail\n\n2. BASICS:\n   2.1. IDENTIFY whether the question is primarily factual, technical, historical, conceptual, or opinion-based\n   2.2. DETERMINE if the subject is likely to be covered in Wikipedia (i.e., well-established topics)\n\n3. BREAK DOWN:\n   3.1. DECOMPOSE the query into atomic searchable components (e.g., keywords, entities, phrases)\n   3.2. FORMULATE effective search queries for each target source\n\n4. ANALYZE SOURCE 1 – WIKIPEDIA:\n   4.1. SEARCH Wikipedia first using relevant terms\n   4.2. IF a satisfactory answer is found (≥80% confidence), SUMMARIZE it clearly and STOP\n   4.3. ELSE, PROCEED to next source\n\n5. ANALYZE SOURCE 2 – HACKER NEWS:\n   5.1. QUERY Hacker News using specific keywords or phrases\n   5.2. SCAN top discussions or comment threads for expert insights\n   5.3. IF relevant content is found (≥70% relevance), SYNTHESIZE into a cohesive answer and STOP\n   5.4. ELSE, CONTINUE to next source\n\n6. ANALYZE SOURCE 3 – SERPAPI:\n   6.1. ISSUE a structured web search using SerpAPI\n   6.2. EXTRACT facts, links, and snippets from top-ranking pages\n   6.3. VALIDATE content by cross-referencing across multiple results\n   6.4. CONSTRUCT a trustworthy, non-speculative response\n\n7. EDGE CASES:\n   7.1. IF all three sources fail, STATE CLEARLY that no high-confidence answer is available\n   7.2. PROVIDE best-effort hypotheses based on logical deduction (if applicable)\n\n8. FINAL ANSWER:\n   8.1. PRESENT the most accurate and concise response\n   8.2. CITE which source(s) were used (Wikipedia, HN, or SerpAPI)\n   8.3. INCLUDE LINKS or specific page titles if helpful\n\n###WHAT NOT TO DO###\n\n- NEVER SKIP THE ORDER: DO NOT JUMP TO HACKER NEWS OR SERPAPI BEFORE EXHAUSTING WIKIPEDIA\n- NEVER FABRICATE FACTS OR INVENT SOURCES\n- NEVER PROVIDE A FINAL ANSWER WITHOUT CITING THE SOURCE(S) USED\n- NEVER COPY-PASTE RAW SEARCH RESULTS – ALWAYS SYNTHESIZE AND INTERPRET\n- DO NOT USE SERPAPI IF WIKIPEDIA OR HACKERNEWS HAVE SUFFICIENT COVERAGE\n- NEVER IGNORE CONTEXT OR USER INTENT\n- AVOID OVERLY LONG RESPONSES; PRIORITIZE CLARITY AND RELEVANCE\n\n###FEW-SHOT EXAMPLES###\n\n**User:** What is the difference between supervised and unsupervised learning?\n\n**Agent:**\n*Source: Wikipedia*  \nSupervised learning involves training a model on labeled data, where each training example is paired with an output label. In contrast, unsupervised learning deals with data that has no labels, and the model attempts to discover patterns or structures within it (e.g., clustering or dimensionality reduction).\n\n---\n\n**User:** What are people on Hacker News saying about OpenAI's new model release?\n\n**Agent:**\n*Source: Hacker News*  \nA recent HN thread discussed OpenAI’s latest release, noting widespread excitement about its coding capabilities. Several users praised the model’s improved memory and API integration. One top comment stated: “It feels like GPT-4 finally understands code beyond syntax.”\n\n---\n\n**User:** What's the latest research on \"liquid neural networks\"?\n\n**Agent:**\n*Source: SerpAPI*  \nWikipedia and HN had minimal information. Using SerpAPI, I found a recent MIT News article explaining that liquid neural networks are dynamic models whose architecture changes based on input over time, making them well-suited for time-series predictions and adaptive tasks.\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        -100,
+        -60
+      ],
+      "id": "5d0744aa-f900-4555-85c8-f6d573dc7edc",
+      "name": "Research Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -240,
+        180
+      ],
+      "id": "99cc435e-8438-43f6-b2be-3bd076321abe",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "F3oSoJLvS41oIIWu",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolWikipedia",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        180
+      ],
+      "id": "aeb061e5-0038-4ada-b28a-6d5d456f8436",
+      "name": "Wikipedia"
+    },
+    {
+      "parameters": {
+        "resource": "all",
+        "limit": "={{ $fromAI(\"limit\") }}",
+        "additionalFields": {
+          "keyword": "={{ $fromAI(\"keyword\") }}"
+        }
+      },
+      "type": "n8n-nodes-base.hackerNewsTool",
+      "typeVersion": 1,
+      "position": [
+        60,
+        180
+      ],
+      "id": "3e15c8aa-07e1-4613-8fa8-ad59334e1205",
+      "name": "Get many items in Hacker News"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolSerpApi",
+      "typeVersion": 1,
+      "position": [
+        180,
+        180
+      ],
+      "id": "03f30d3c-a315-4c85-a425-ceac3504c949",
+      "name": "SerpAPI",
+      "credentials": {
+        "serpApi": {
+          "id": "OTDKFuiAh161EYhR",
+          "name": "SerpAPI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3d84efd4-bf5f-4cb3-9a65-f27c4e71dd08",
+              "name": "response",
+              "value": "={{$json.output}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        260,
+        -60
+      ],
+      "id": "22440d4e-0c37-45ed-a98e-5ced701e9c2d",
+      "name": "Response"
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "query": "What is the highest mountain in the world? "
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Research Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Research Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wikipedia": {
+      "ai_tool": [
+        [
+          {
+            "node": "Research Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many items in Hacker News": {
+      "ai_tool": [
+        [
+          {
+            "node": "Research Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SerpAPI": {
+      "ai_tool": [
+        [
+          {
+            "node": "Research Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Research Agent": {
+      "main": [
+        [
+          {
+            "node": "Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "5bf76b36-6448-452c-b05c-c8f079676bd0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b4ed66d73b3908b3d2a2a6aedad1a6a04f56474367e7652ca28ada9f61172442"
+  },
+  "id": "0R0R8UrQYtd2Lukm",
+  "tags": []
+}

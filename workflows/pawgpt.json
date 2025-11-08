@@ -1,0 +1,807 @@
+{
+  "name": "🤖 PawGPT",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        440,
+        -380
+      ],
+      "id": "d7a57851-5235-4bd3-ae69-a8f0c8a78a82",
+      "name": "When chat message received",
+      "webhookId": "300cd268-49f5-44a9-a491-2953c019e4ea"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1700,
+        380
+      ],
+      "id": "c25f4faf-091e-4f04-8419-0c2a9ca34112",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "F3oSoJLvS41oIIWu",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body.query }}",
+        "options": {
+          "systemMessage": "=YOU ARE **\"PawGPT\"**, THE SCHOOL'S OFFICIAL FAQ AGENT — A FUNNY, FRIENDLY, AND HIGHLY INFORMATIVE AI DESIGNED TO ANSWER STUDENT, PARENT, AND TEACHER QUESTIONS ABOUT THE SCHOOL. YOU POSSESS ACCESS TO A **VECTOR DATABASE** THAT STORES ALL SCHOOL DOCUMENTS, POLICIES, EVENT SCHEDULES, AND HISTORICAL FAQ DATA.\n\nYOUR PERSONALITY IS CHARMINGLY WITTY BUT ALWAYS RESPECTFUL AND EDUCATIONAL. YOU TURN BORING INFORMATION INTO ENGAGING, MEMORABLE RESPONSES — THINK “A KNOWLEDGEABLE SCHOOL COUNSELOR WHO SECRETLY DOES STAND-UP COMEDY.”\n\n---\n\n### CORE OBJECTIVE\n\nCREATE THE WORLD’S MOST ENGAGING AND ACCURATE **SCHOOL FAQ AGENT** THAT:\n- GIVE INFORMATION ABOUT UNIVERSITY OF MARYLAND, BALTIMORE COUNTY AND RELATED INFORMATION\n- RETRIEVES FACTS FROM A VECTOR DATABASE USING SEMANTIC SEARCH\n- PROVIDES PRECISE, EASY-TO-UNDERSTAND ANSWERS\n- INFUSES HUMOR APPROPRIATELY WITHOUT COMPROMISING ACCURACY\n- MAINTAINS A WARM, FRIENDLY, SCHOOL-APPROPRIATE PERSONALITY\n- DETECTS WHEN THE USER’S QUESTION IS OUTSIDE SCHOOL-RELATED DOMAINS AND RESPONDS POLITELY WITH A HUMOROUS DEFLECTION\n\n---\n\n### FUNCTIONAL SPECIFICATIONS\n\n- **RETRIEVE INFORMATION**: USE VECTOR SEARCH TO LOCATE THE MOST RELEVANT PASSAGES IN THE SCHOOL DATABASE.\n- **SUMMARIZE**: SYNTHESIZE RESULTS INTO A SINGLE, CLEAR, FACTUALLY ACCURATE ANSWER.\n- **ADD HUMOR**: ADD ONE LIGHT HUMOR ELEMENT OR PLAYFUL COMMENT PER ANSWER (e.g., a clever remark, pun, or friendly metaphor).\n- **TONE**: FUNNY, INFORMATIVE, RELATABLE, AND POSITIVE — NEVER SARCASTIC OR CONDESCENDING.\n- **STRUCTURE**: SHORT, ENGAGING PARAGRAPHS; USE BULLETS OR BOLD TEXT FOR CLARITY.\n\n---\n\n### CHAIN OF THOUGHTS (MANDATORY)\n\nFOLLOW THESE STEPS BEFORE EVERY ANSWER:\n\n1. **UNDERSTAND**  \n   - READ the user’s question carefully.  \n   - DETERMINE whether it’s related to the school (academics, schedules, events, rules, teachers, etc.).  \n\n2. **BASICS**  \n   - IDENTIFY keywords and intent (e.g., “lunch menu,” “admissions,” “exam schedule”).  \n   - MAP them to possible vector database entries.  \n\n3. **BREAK DOWN**  \n   - SEPARATE multi-part questions (e.g., “What’s the cafeteria menu AND where’s the library?”).  \n   - HANDLE each part independently.  \n\n4. **ANALYZE**  \n   - QUERY the vector database for the top-matching documents.  \n   - SUMMARIZE the key facts retrieved.  \n\n5. **BUILD**  \n   - COMPOSE a concise, clear, accurate answer.  \n   - INJECT a touch of humor (e.g., “Yes, our cafeteria does serve pizza — but sadly, no pepperoni rainstorms today.”).  \n\n6. **EDGE CASES**  \n   - IF information is missing, ACKNOWLEDGE that gracefully (“I couldn’t find the answer in the database — maybe it’s hiding in the principal’s secret drawer.”).  \n\n7. **FINAL ANSWER**  \n   - FORMAT response clearly.  \n   - CLOSE with a friendly remark or light joke.  \n\n---\n\n### OPTIMIZATION STRATEGIES\n\n- **FOR CLASSIFICATION TASKS** (e.g., “Is this question about admissions or events?”):  \n  USE embedding similarity to categorize.  \n\n- **FOR GENERATION TASKS** (e.g., summarizing or paraphrasing):  \n  RETRIEVE top-3 results from the vector DB and SYNTHESIZE in a fun, educational tone.  \n\n- **FOR QUESTION ANSWERING**:  \n  PRIORITIZE clarity and correctness first; humor comes second.  \n\n---\n\n### WHAT NOT TO DO\n\n- ❌ NEVER INVENT FACTS or provide information not found in the vector database.  \n- ❌ NEVER USE MEAN-SPIRITED OR INAPPROPRIATE HUMOR.  \n- ❌ NEVER GIVE LONG, DENSE PARAGRAPHS WITHOUT STRUCTURE.  \n- ❌ NEVER SOUND ROBOTIC, MONOTONE, OR FORMAL — YOU’RE A FUN SCHOOL GUIDE!  \n- ❌ NEVER IGNORE THAT YOU ARE A SCHOOL AGENT — ALWAYS MAINTAIN YOUR ROLE.  \n- ❌ NEVER SHARE CONFIDENTIAL DATA OR PRIVATE INFORMATION ABOUT STUDENTS OR STAFF.  \n- ❌ NEVER SAY YOU CAN’T HELP — OFFER ALTERNATIVES OR SUGGESTIONS (“Try asking the admin office; they love visitors — especially ones who bring donuts.”).\n\n---\n\n### FEW-SHOT EXAMPLES\n\n**Example 1**  \n**User:** “What time does school start?”  \n**Agent:** “School starts at **8:30 AM sharp** — that’s ‘sharp’ as in ‘your teacher’s pencil when you’re late.’ Be in class by then, or risk missing the morning announcements and the smell of fresh coffee from the teacher’s lounge.”\n\n---\n\n**Example 2**  \n**User:** “Where can I find the lunch menu?”  \n**Agent:** “You can find the **weekly lunch menu on the school website → ‘Student Resources’ → ‘Cafeteria Menu.’** Today’s highlight? Taco Tuesday! (Warning: may cause uncontrollable happiness.)”\n\n---\n\n**Example 3**  \n**User:** “Who’s the principal?”  \n**Agent:** “Our fearless leader is **Dr. Susan Harper**, principal extraordinaire and coffee enthusiast. She’s the reason we have Wi-Fi *and* clean hallways — truly a modern hero.”\n\n---\n\n**Example 4**  \n**User:** “Can you help me with math homework?”  \n**Agent:** “I wish! Sadly, my brain’s better at *school trivia* than trigonometry. But I can tell you who runs the **Math Tutoring Club** if you want real help (and maybe snacks).”\n\n---\n\n\n# ADDITIONAL INFORMATION\n- You are talking to Khoi.\n- The current date and time is {{ $now.toString()}}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        660,
+        -20
+      ],
+      "id": "e36b1858-0b77-4478-b123-859569603f96",
+      "name": "Supervisor"
+    },
+    {
+      "parameters": {
+        "description": "Use this tool for any emails related actions including generating, drafting, sending, or replying to an email.",
+        "workflowId": {
+          "__rl": true,
+          "value": "agtjConrzN0DBIjK",
+          "mode": "list",
+          "cachedResultName": "Email Agent"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        880,
+        300
+      ],
+      "id": "22f665b2-fdb7-40e7-bf6d-1ec80a1c8350",
+      "name": "Email"
+    },
+    {
+      "parameters": {
+        "description": "Use this tool for all contacts-related actions. You can also use this tool to access email addresses.",
+        "workflowId": {
+          "__rl": true,
+          "value": "RspmEtqWFEhNfXps",
+          "mode": "list",
+          "cachedResultName": "Contact Agent"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        1620,
+        120
+      ],
+      "id": "b293377a-3f10-40c6-a362-439180d016ef",
+      "name": "Contact"
+    },
+    {
+      "parameters": {
+        "description": "Use this tool for all calendar-related or scheduling actions.",
+        "workflowId": {
+          "__rl": true,
+          "value": "LiCkkZNa5x7sKDsi",
+          "mode": "list",
+          "cachedResultName": "Calendar Agent"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        1620,
+        260
+      ],
+      "id": "3f1df96c-cbda-4d64-85c7-251a6ec3ea5f",
+      "name": "Scheduling"
+    },
+    {
+      "parameters": {
+        "description": "Use this tool for any searching or researching-related activities to find the answer to the user's questions",
+        "workflowId": {
+          "__rl": true,
+          "value": "0R0R8UrQYtd2Lukm",
+          "mode": "list",
+          "cachedResultName": "Research Agent"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        740,
+        300
+      ],
+      "id": "0cbd977c-de06-40bd-ae74-2e5ce13cce8f",
+      "name": "Research"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "pawgpt",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        400,
+        -20
+      ],
+      "id": "737bab2f-dd12-4e4c-bc9e-dd14878157c5",
+      "name": "Webhook",
+      "webhookId": "16c5854c-83b8-4f86-91b9-b457aaec1607"
+    },
+    {
+      "parameters": {
+        "jsCode": "const aiOutput =\n  $json.output ||\n  $json.text ||\n  $json.message ||\n  $json.response ||\n  \"No response from AI.\";\n\nreturn [{ answer: aiOutput }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1520,
+        -60
+      ],
+      "id": "1237d859-63f2-479d-9f5e-5d7529aca70f",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1100,
+        -20
+      ],
+      "id": "7117d3f2-4d51-4bdb-969e-d5d8d852a5f0",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.body.sessionId }}",
+        "contextWindowLength": 20
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        580,
+        300
+      ],
+      "id": "633aab01-bac4-488d-a0c9-53699c9baa23",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        340,
+        300
+      ],
+      "id": "7a29793c-8b85-4255-9787-52cdc4c08de2",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "BdsLIMFXHD54TcCX",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1520,
+        380
+      ],
+      "id": "a5e5e6e1-c55d-405a-a6b4-5b445bcfe2ec",
+      "name": "Embeddings Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "F3oSoJLvS41oIIWu",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1060,
+        320
+      ],
+      "id": "1fa0807c-90ef-4e96-a6a7-4bbdd7e4adc5",
+      "name": "Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "BdsLIMFXHD54TcCX",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "64f3785b-a6e5-4d70-b88b-f43366367982",
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        320,
+        1640
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolName": "PackageDetails",
+        "toolDescription": "Return the Accounts Payable details reading the information from the input file. ",
+        "pineconeIndex": {
+          "__rl": true,
+          "mode": "list",
+          "value": "package1536",
+          "cachedResultName": "package1536"
+        },
+        "options": {
+          "pineconeNamespace": ""
+        }
+      },
+      "id": "06b96e40-2094-4a14-85a0-4f4c44112707",
+      "name": "Pinecone Vector Store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "position": [
+        1280,
+        1880
+      ],
+      "typeVersion": 1.1,
+      "credentials": {
+        "pineconeApi": {
+          "id": "ArrsTofWkL8yPiCz",
+          "name": "PineconeApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "text",
+        "options": {}
+      },
+      "id": "80a6884d-4f0f-41a0-9b6c-dc9626d288a5",
+      "name": "Extract from File",
+      "type": "n8n-nodes-base.extractFromFile",
+      "position": [
+        920,
+        1640
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "returnAll": true,
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "mode": "list",
+            "value": "172VdwV-JNLv0H7i7OXRMjYqIshg6ow1O",
+            "cachedResultUrl": "https://drive.google.com/drive/folders/172VdwV-JNLv0H7i7OXRMjYqIshg6ow1O",
+            "cachedResultName": "EDIFileForProcessing"
+          }
+        },
+        "options": {}
+      },
+      "id": "612ff0ad-095d-4d3b-8727-29338233fea6",
+      "name": "Google Drive: extract files",
+      "type": "n8n-nodes-base.googleDrive",
+      "position": [
+        520,
+        1640
+      ],
+      "typeVersion": 3
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $json.id }}"
+        },
+        "options": {}
+      },
+      "id": "b671e754-486a-4054-942d-80d511bcd519",
+      "name": "Google Drive: download file contents",
+      "type": "n8n-nodes-base.googleDrive",
+      "position": [
+        720,
+        1640
+      ],
+      "typeVersion": 3
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "e3c20f11-150e-413d-80e4-e3894fc33004",
+      "name": "Embeddings OpenAI1",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "position": [
+        1280,
+        2040
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "openAiApi": {
+          "id": "BdsLIMFXHD54TcCX",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "id": "7a31e3c0-a0e5-4824-948b-b25690838762",
+      "name": "OpenAI Chat Model 2",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        1060,
+        1880
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "openAiApi": {
+          "id": "BdsLIMFXHD54TcCX",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=\nUse the incoming EDI files and generate Account Receivable Report by going throug each file, listing the account receivables for each PNR and the passenger data. \n {{ $json.data }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "##Role##\nYou are an Accounting and Finance Reporting Expert and you understand the incoming EDI file from which you extract data and compile Accounts Receivable (AR) Summary Report\n\nInstruction:\nRead the incoming EDI file and identify the accounting info and generate accounting receivable report. \nIf there are data that you don't understand, query the pinecone vector database where the complete guidelines is stored for the undersatnding. \nOutput just the table with the data. No need to give a dscription in the begining. \n\nGenerate report in the below tabular format that is extractable in JSON format: \n\n{\n  [\n    {\"passenger\": \"Sergei\", \"fare\": 414, \"tax\": 34.88, \"total\": 448.88}\n  ]\n}\nNote:\nNever ever create your own AR report if in doubt or missing data.\n"
+        }
+      },
+      "id": "65c28c56-3b16-40ef-a54a-063f55877f15",
+      "name": "Document Retriever Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        1140,
+        1640
+      ],
+      "typeVersion": 1.9
+    },
+    {
+      "parameters": {
+        "formTitle": "Upload your data to test RAG",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Upload your file(s)",
+              "fieldType": "file",
+              "multipleFiles": false,
+              "acceptFileTypes": ".pdf, .csv",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        400,
+        500
+      ],
+      "id": "199e1cdb-918d-4f28-8788-4ccae0a2b485",
+      "name": "Upload your file here",
+      "webhookId": "82848bc4-5ea2-4e5a-8bb6-3c09b94a8c5d"
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        800,
+        680
+      ],
+      "id": "9066e6bd-487a-49c1-895b-812e63dc3f1e",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "pawgpt",
+          "mode": "list",
+          "cachedResultName": "pawgpt"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        660,
+        500
+      ],
+      "id": "2ecf79a1-64e8-4581-81a3-5c243b1f6fdd",
+      "name": "Pinecone Vector Store1",
+      "credentials": {
+        "pineconeApi": {
+          "id": "XHccWJT3kGCNaYHH",
+          "name": "PineconeApi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Use this tool to answer questions that relates to University of Maryland, Baltimore County (UMBC)",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "pawgpt",
+          "mode": "list",
+          "cachedResultName": "pawgpt"
+        },
+        "topK": 5,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        1080,
+        180
+      ],
+      "id": "5b96cd70-0a0d-4d0d-86ec-9baf9a00d094",
+      "name": "Retriever Knowledge Base",
+      "credentials": {
+        "pineconeApi": {
+          "id": "XHccWJT3kGCNaYHH",
+          "name": "PineconeApi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        580,
+        680
+      ],
+      "id": "f05d9b3b-7da2-45a1-855c-f9fa72213bfd",
+      "name": "Embeddings OpenAI2",
+      "credentials": {
+        "openAiApi": {
+          "id": "BdsLIMFXHD54TcCX",
+          "name": "OpenAi account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Supervisor": [
+      {
+        "json": {
+          "output": "Your name is Khoi."
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When chat message received": {
+      "main": [
+        []
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        []
+      ]
+    },
+    "Email": {
+      "ai_tool": [
+        [
+          {
+            "node": "Supervisor",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Contact": {
+      "ai_tool": [
+        []
+      ]
+    },
+    "Scheduling": {
+      "ai_tool": [
+        []
+      ]
+    },
+    "Research": {
+      "ai_tool": [
+        [
+          {
+            "node": "Supervisor",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Supervisor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supervisor": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        []
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Supervisor",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Supervisor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        []
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Retriever Knowledge Base",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Google Drive: extract files",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pinecone Vector Store": {
+      "ai_tool": [
+        [
+          {
+            "node": "Document Retriever Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Document Retriever Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive: extract files": {
+      "main": [
+        [
+          {
+            "node": "Google Drive: download file contents",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive: download file contents": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model 2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Document Retriever Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload your file here": {
+      "main": [
+        [
+          {
+            "node": "Pinecone Vector Store1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Pinecone Vector Store1",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retriever Knowledge Base": {
+      "ai_tool": [
+        [
+          {
+            "node": "Supervisor",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI2": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "26f82ac8-a898-48ec-965c-5d02c1e525ed",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b4ed66d73b3908b3d2a2a6aedad1a6a04f56474367e7652ca28ada9f61172442"
+  },
+  "id": "jkYtp8FQt45c2ufT",
+  "tags": []
+}
